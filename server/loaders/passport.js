@@ -1,5 +1,6 @@
 const passport = require('passport');
 const { Strategy } = require('passport-local');
+const AuthController = require('../controllers/authController');
 
 async function passportLoader(app) {
     app.use(passport.initialize());
@@ -13,13 +14,20 @@ async function passportLoader(app) {
         done(null, user);
     })
 
-    passport.use(new Strategy(async (email, password, done) => {
+    passport.use(new Strategy({ usernameField: "email", passwordField: "password" }, async (email, password, done) => {
         try {
-            console.log(email, password);
+            const response = await AuthController.login({ email: email, password: password });
+            if (response && response.ok) {
+                return done(null, response.data.data);
+            } else {
+                return done(null, false);
+            }
         } catch (error) {
             return done(error);
         }
     }))
+
+    return passport;
 }
 
 module.exports = passportLoader;

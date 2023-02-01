@@ -1,4 +1,6 @@
-class Item {
+const pool = require('../db');
+
+module.exports = class Item {
     name;
     description;
     created;
@@ -12,7 +14,23 @@ class Item {
         this.modified = new Date(Date.now()).toDateString();
     }
 
-    async getAll() {
+    static async getAll() {
+        const query = `SELECT * FROM item;`
+        const result = await pool.query(query);
+        if (result.rows.length) {
+            return result.rows;
+        }
 
+        return null;
+    }
+
+    static async getOne(id) {
+        const query = `SELECT * FROM item WHERE id = $1`;
+        const result = await pool.query(query, [id]);
+        if (result.rows.length) {
+            return result.rows[0];
+        }
+
+        return null;
     }
 }

@@ -9,6 +9,9 @@ const root = path.resolve(__dirname);
 async function seed() {
     console.clear();
 
+    await pool.query(`DROP TABLE IF EXISTS item`);
+    await pool.query(`DROP TABLE IF EXISTS appuser`);
+
     const createUserTable = fs.readFileSync(root + "/sql/create/createUserTable.sql").toString();
     const createItemTable = fs.readFileSync(root + "/sql/create/createItemTable.sql").toString();
     const populateItemTable = fs.readFileSync(root + "/sql/populate/populateItemTable.sql").toString();
