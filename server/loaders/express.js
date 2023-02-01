@@ -20,7 +20,8 @@ async function expressLoader(app) {
         secret: secret,
         cookie: {
             maxAge: 8 * 60 * 60 * 1000,
-            secure: false
+            secure: false,
+            httpOnly: false
         },
         resave: false,
         saveUninitialized: false,

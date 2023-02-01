@@ -83,7 +83,7 @@ module.exports = class AuthController {
             const newUser = new User(userData.username, userData.email, hash);
             const result = await User.create(newUser);
 
-            return new ControllerResponse(result.rows.length > 0, result, (result.rows.length > 0 ? 201 : 400));
+            return new ControllerResponse(result.length > 0, result, (result.length > 0 ? 201 : 400));
         } catch (error) {
             console.log(error);
         }

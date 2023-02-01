@@ -2,6 +2,15 @@ const router = require('express').Router();
 const ItemController = require('../controllers/ItemController');
 
 function itemRoute(app, passport) {
+    router.use('/', (req, res, next) => {
+        if (req.user == null) {
+            res.status(403).send("Unauthorized");
+            return;
+        } else {
+            next();
+        }
+    })
+
     router.get('/item', async (req, res) => {
         const response = await ItemController.getAll();
         const { data, code } = response;
