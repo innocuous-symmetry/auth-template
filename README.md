@@ -22,4 +22,20 @@ specify where the server should listen
 
 ## Steps to extend
 
-(to determine)
+The following middleware (taken from `server/routes/index.js`) can be used anywhere user verification is needed:
+
+```
+app.use('/app', (req, res, next) => {
+    const token = req.headers['authorization'].split(" ")[1];
+    jwt.verify(token, process.env.SECRET, (err, data) => {
+        if (err) {
+            res.status(403).send(err);
+        } else {
+            req.user = data;
+            next();
+        }
+    })
+})
+```
+
+Additional passport strategies may also be included for auth workflows such as OAuth 2.0
