@@ -1,51 +1,73 @@
 import { useEffect, useState } from 'react';
-import Home from './pages/Home'
+import jwt_decode from "jwt-decode";
 import API from './util/API';
-import './App.css'
 import Auth from './pages/Auth';
+import './App.css'
 
 function App() {
   const [user, setUser] = useState(null);
-  const [contents, setContents] = useState();
+  const [contents, setContents] = useState(<></>);
 
-  useEffect(() => {
-    (async() => {
-      const res = await API.validate();
-      console.log(res);
+  async function handleLogin(info) {
+    if (!info.email || !info.password) return;
 
-      if (res.user) {
-        setUser(res.user);
-      } else {
-        setUser(null);
-      }
-    })();
-  }, [])
+    const response = await API.login(info);
+    console.log(response);
 
-  useEffect(() => {
-    setContents(user ? <Home user={user} handleLogout={handleLogout} /> : <Auth handleLogin={handleLogin} handleRegister={handleRegister} />);
-  }, [user]);
+    const user = jwt_decode(response.token);
+    console.log(user);
+
+    localStorage.setItem('user', JSON.stringify(user));
+    localStorage.setItem('token', response.token);
+  }
 
   async function handleLogout() {
     await API.logout();
-    setUser(null);
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
   }
 
-  async function handleLogin(info) {
-    const res = await API.login(info);
-    if (res.data) setUser(res.data);
-    return;
+  async function handleRegister(register) {
+      if (!register.username || !register.email || !register.password) return;
+      await API.register(register);
   }
 
-  async function handleRegister(info) {
-    const res = await API.register(info);
-    console.log(res);
-    return;
-  }
+  useEffect(() => {
+    let item = localStorage.getItem('user');
+    if (item) {
+      item = JSON.parse(item);
+      setUser(item.user);
+    }
+  }, [])
+
+  useEffect(() => {
+    let protectedData;
+
+    if (user) {
+      (async() => {
+        protectedData = await API.getItems();
+        console.log(protectedData);
+      })();
+    }
+
+    setContents(
+      user ? (
+        <div>
+          <p>Welcome, {user.username}!</p>
+          <div>
+
+          </div>
+          <button onClick={handleLogout}>Log Out</button>
+        </div>
+      ) : (
+        <Auth handleLogin={handleLogin} handleRegister={handleRegister} />
+      )
+    )
+  }, [user])
 
   return (
     <div className="App">
       <h1>Auth Testing</h1>
-
       { contents }
     </div>
   )

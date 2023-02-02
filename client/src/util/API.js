@@ -1,5 +1,4 @@
-import axiosInstance from './axiosInstance';
-const _api = axiosInstance();
+import { default as _api } from './axiosInstance';
 
 export default class API {
     static async validate() {
@@ -42,7 +41,14 @@ export default class API {
     }
 
     static async getItems() {
-        const response = await _api.get('/app/item');
+        const token = localStorage.getItem("token");
+
+        const response = await _api.get('/app/item', {
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": ("Bearer " + token)
+            }
+        });
         return Promise.resolve(response.data);
     }
 }

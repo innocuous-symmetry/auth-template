@@ -1,6 +1,6 @@
 const passport = require('passport');
-const { Strategy } = require('passport-local');
-const AuthController = require('../controllers/authController');
+const JwtStrategy = require('passport-jwt').Strategy;
+const { ExtractJwt } = require('passport-jwt');
 
 async function passportLoader(app) {
     app.use(passport.initialize());
@@ -18,24 +18,20 @@ async function passportLoader(app) {
         })
     })
 
-    passport.use(new Strategy({ usernameField: "email", passwordField: "password" }, async (email, password, done) => {
-        console.log('calling local strategy');
-        console.log(email, password);
+    // config for jwt strategy
+    let opts = {
+        jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+        secretOrKey: 'secret'
+    }
 
+    // jwt strategy
+    passport.use(new JwtStrategy(opts, async (token, done) => {
         try {
-            console.log('before response')
-            const response = await AuthController.login({ email: email, password: password });
-            console.log(response);
-            
-            if (response && response.ok) {
-                return done(null, response.data.data);
-            } else {
-                return done(null, false);
-            }
+            return done(null, token.user);
         } catch (error) {
-            return done(error);
+            done(error);
         }
-    }))
+    }));
 
     return passport;
 }

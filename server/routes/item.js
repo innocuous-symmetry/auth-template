@@ -1,14 +1,20 @@
+const jwt = require('jsonwebtoken');
+require('dotenv').config();
 const router = require('express').Router();
 const ItemController = require('../controllers/ItemController');
 
-function itemRoute(app, passport) {
+async function itemRoute(app, passport) {
     router.use('/', (req, res, next) => {
-        if (req.user == null) {
-            res.status(403).send("Unauthorized");
-            return;
-        } else {
-            next();
-        }
+        console.log('check for jwt');
+        const token = req.headers['authorization'].split(" ")[1];
+        jwt.verify(token, process.env.SECRET, (err, data) => {
+            if (err) {
+                res.status(403).send(err);
+            } else {
+                req.user = data;
+                next();
+            }
+        })
     })
 
     router.get('/item', async (req, res) => {
