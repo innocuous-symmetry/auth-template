@@ -51,4 +51,16 @@ export default class API {
         });
         return Promise.resolve(response.data);
     }
+
+    static async getOneItem(id) {
+        const token = localStorage.getItem("token");
+
+        const response = await _api.get(`/app/item/${id}`, {
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": ("Bearer " + token)
+            }
+        });
+        return Promise.resolve(response.data);
+    }
 }

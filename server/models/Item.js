@@ -26,7 +26,7 @@ module.exports = class Item {
 
     static async getOne(id) {
         const query = `SELECT * FROM item WHERE id = $1`;
-        const result = await pool.query(query, [id]);
+        const result = await pool.query(query, [parseInt(id)]);
         if (result.rows.length) {
             return result.rows[0];
         }

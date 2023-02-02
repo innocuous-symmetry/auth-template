@@ -17,7 +17,7 @@ async function authRoute(app, passport) {
         }
     })
 
-    router.post('/login', passport.authenticate('local'), async (req, res, next) => {
+    router.post('/login', async (req, res, next) => {
         try {
             const data = req.body;
             let response = await AuthController.login(data);
