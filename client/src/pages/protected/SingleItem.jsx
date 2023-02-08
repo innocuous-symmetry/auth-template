@@ -1,15 +1,17 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom"
+import useAuthContext from "../../context/useAuthContext";
 import API from "../../util/API";
 
 function SingleItem() {
     const [content, setContent] = useState(<p>Loading...</p>);
+    const { token, setToken } = useAuthContext();
     const { id } = useParams();
 
     useEffect(() => {
         (async() => {
             try {
-                const data = await API.getOneItem(id);
+                const data = await API.getOneItem(id, token);
                 console.log(data);
                 setContent(
                     <>
@@ -26,7 +28,7 @@ function SingleItem() {
                 )
             }
         })();
-    }, []);
+    }, [token, setToken]);
 
     return (
         <div>

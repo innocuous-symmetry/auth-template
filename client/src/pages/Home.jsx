@@ -1,26 +1,24 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import jwt_decode from "jwt-decode";
+import useAuthContext from "../context/useAuthContext"
 import API from "../util/API";
 import Auth from "./Auth";
 import Welcome from "./protected/Welcome";
 
 function Home() {
-    const [user, setUser] = useState(null);
     const [contents, setContents] = useState(<></>);
     const [update, setUpdate] = useState(false);
+    const { user, setUser, token, setToken } = useAuthContext();
     const navigate = useNavigate();
 
     async function handleLogin(info) {
         if (!info.email || !info.password) return;
     
         const response = await API.login(info);
-        const user = jwt_decode(response.token);
     
-        console.log(user);
-        localStorage.setItem('user', JSON.stringify(user));
-        localStorage.setItem('token', response.token);
-    
+        setUser(response.user);
+        setToken(response.token);
+
         setUpdate(!update);
     }
     
@@ -46,16 +44,8 @@ function Home() {
     }
 
     useEffect(() => {
-        let item = localStorage.getItem('user');
-        if (item) {
-            item = JSON.parse(item);
-            setUser(item.user);
-        }
-    }, [update])
-
-    useEffect(() => {
-        setContents(user ? <Welcome user={user} handleLogout={handleLogout} /> : <Auth handleLogin={handleLogin} handleRegister={handleRegister} />)
-    }, [user, update])
+        setContents(user ? <Welcome handleLogout={handleLogout} /> : <Auth handleLogin={handleLogin} handleRegister={handleRegister} />)
+    }, [token])
 
     return (
         <main>

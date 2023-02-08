@@ -1,15 +1,21 @@
 import { useState, useEffect } from "react";
 import API from "../../util/API";
 import { v4 } from "uuid";
+import useAuthContext from "../../context/useAuthContext";
 
 function Items() {
     const [items, setItems] = useState(<p>Loading...</p>);
+    const { token, setToken } = useAuthContext();
     const [content, setContent] = useState();
 
     useEffect(() => {
-        (async() => {
+        console.log(token);
+
+        token && (async() => {
             try {
-                const data = await API.getItems();
+                const data = await API.getItems(token);
+                console.log(data);
+                
                 setItems(data.map(item => (
                     <div className="item" key={v4()}>
                         <a href={`/item/${item.id}`}>{item.name}</a>
@@ -25,7 +31,7 @@ function Items() {
                 )
             }
         })();
-    }, [])
+    }, [token, setToken])
 
     return (
         <main>

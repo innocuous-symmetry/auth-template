@@ -30,6 +30,8 @@ async function authRoute(app, passport) {
                     response = response.data;
                 }
 
+                console.log(response);
+
                 req.user = response;
                 req.session.user = response;
 
@@ -43,12 +45,14 @@ async function authRoute(app, passport) {
                 }
 
                 const token = jwt.sign({ user: safeUserData }, secret);
-                req.session.token = token;
 
                 req.session.save((err) => {
                     return next(err);
                 })
 
+                console.log(req.session);
+
+                res.cookie('token', token, { httpOnly: true });
                 res.json({ token });
             }
         } catch (error) {
@@ -60,7 +64,8 @@ async function authRoute(app, passport) {
         try {
             req.session = null;
             req.user = null;
-            res.status(200).clearCookie('connect.sid');
+            res.clearCookie('connect.sid').clearCookie('token');
+            res.status(204).send("logout successful");
             res.end();
         } catch (error) {
             console.log(error);

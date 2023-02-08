@@ -1,11 +1,21 @@
 import { useNavigate } from "react-router-dom"
+import API from "../../util/API";
+import useAuthContext from "../../context/useAuthContext";
 
-function Welcome({ user, handleLogout }) {
+function Welcome() {
     const navigate = useNavigate();
+    const { user, setUser, setToken } = useAuthContext();
+
+    async function handleLogout() {
+        await API.logout();
+        setUser(null);
+        setToken(null);
+        navigate('/');
+    }
 
     return (
         <section>
-            <h2>Welcome, {user.username}!</h2>
+            <h2>Welcome, {user?.username}!</h2>
             <hr />
 
             <h3>Check out some cool protected actions:</h3>
